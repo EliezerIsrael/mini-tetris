@@ -1,45 +1,45 @@
 // _() – Main loop
-// M(code) – Map P to p using code and merge it with field B into field b.
-//           Return true if piece overlaps with B.
+// M(code) – Map currentPiece to updatedPiece using code and merge it with field currentStateOfField into field updatedPlayingFieldState.
+//           Return true if piece overlaps with currentStateOfField.
 
-// B – Current state of playing field, format: [c00<<0|c01<<1|…, c10<<0|c11<<1|…, …]
-// b - Updated state of playing field
-// C - Copy of empty playing field
-// P – Current piece, format: [x0, y0, x1, y1, …]
-// p – Updated piece
-// k – Last key code pressed (- 38)
-// S - Total score
-// s – Tally of current move used to reward clearing multiple lines, keyboard event
-// G – Game over state
+// currentStateOfField – Current state of playing field, format: [c00<<0|c01<<1|…, c10<<0|c11<<1|…, …]
+// updatedPlayingFieldState - Updated state of playing field
+// copyOfEmptyField - Copy of empty playing field
+// currentPiece – Current piece, format: [x0, y0, x1, y1, …]
+// updatedPiece – Updated piece
+// lastKeyCode – Last key code pressed (- 38)
+// totalScore - Total score
+// tallyOfCurrentMove – Tally of current move used to reward clearing multiple lines, keyboard event
+// gameOverState – Game over state
 
-M=e=>P&&(
+M=e=>currentPiece&&(
     h=0,
-    p=P.map((v,i)=>(
+    updatedPiece=currentPiece.map((v,i)=>(
         E=~i%2,
         x=eval(e[0]),
         E
             ?0
-            :b[h|=x<0|x>9|b[y]>>x&1|y>17,y]|=1<<x,
+            :updatedPlayingFieldState[h|=x<0|x>9|updatedPlayingFieldState[y]>>x&1|y>17,y]|=1<<x,
         y=x
-    ),b=[...B]),
+    ),updatedPlayingFieldState=[...currentStateOfField]),
     h
 ),
-b=C=Array(9),
-(onkeydown=_=s=>(
-    s
-        ?(k=s.which-38)%2-k||M`k?v-!E*k:P[2]-(P[i^1]-P[3])*(E|1)`
+updatedPlayingFieldState=copyOfEmptyField=Array(9),
+(onkeydown=_=tallyOfCurrentMove=>(
+    tallyOfCurrentMove
+        ?(lastKeyCode=tallyOfCurrentMove.which-38)%2-lastKeyCode||M`k?v-!E*k:P[2]-(P[i^1]-P[3])*(E|1)`
             ?M`v`
-            :P=p
-        :G||(
-            P=P||[...'02121303040506161715'.substr(
+            :currentPiece=updatedPiece
+        :gameOverState||(
+            currentPiece=currentPiece||[...'02121303040506161715'.substr(
                 new Date%7*2,
                 8,
-                B=[...C,...b].filter(v=>v^1023||!(S+=++s)).slice(-18)
+                currentStateOfField=[...copyOfEmptyField,...updatedPlayingFieldState].filter(v=>v^1023||!(totalScore+=++tallyOfCurrentMove)).slice(-18)
             )],
-            M`v-E`&&(G=M`v`,p=k=0),
-            setTimeout(_,k-2?200:20,0),
-            P=p
+            M`v-E`&&(gameOverState=M`v`,updatedPiece=lastKeyCode=0),
+            setTimeout(_,lastKeyCode-2?200:20,0),
+            currentPiece=updatedPiece
         ),
-    S|=b.map(v=>{S+=`
-`;for(x=10;x--;)Z.innerText=S+='□■'[G^(v^1023+P&&v>>x&1)]})
-))(S=P=k=G=0)
+    totalScore|=updatedPlayingFieldState.map(v=>{S+=`
+`;for(x=10;x--;)Z.innerText=totalScore+='□■'[gameOverState^(v^1023+currentPiece&&v>>x&1)]})
+))(totalScore=currentPiece=lastKeyCode=gameOverState=0)
